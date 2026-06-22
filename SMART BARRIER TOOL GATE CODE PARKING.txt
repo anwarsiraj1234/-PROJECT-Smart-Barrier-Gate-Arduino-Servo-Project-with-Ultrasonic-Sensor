@@ -1,0 +1,108 @@
+```cpp
+/*
+ * ==============================================================
+ * PROJECT: Smart Barrier Gate | Arduino Servo Project with
+ *          Ultrasonic Sensor
+ *
+ * MADE BY: Sir Anwar Siraj DS & AI Robotics
+ *
+ * DESCRIPTION:
+ * This project uses an HC-SR04 Ultrasonic Sensor to detect
+ * approaching vehicles or objects. When an object comes within
+ * 30 cm, the servo motor automatically raises the barrier gate.
+ * After a short delay, the gate closes automatically.
+ *
+ * COMPONENTS USED:
+ * - Arduino Uno/Nano
+ * - HC-SR04 Ultrasonic Sensor
+ * - SG90/MG90 Servo Motor
+ * - Jumper Wires
+ * - Power Supply
+ *
+ * APPLICATIONS:
+ * - Smart Parking Systems
+ * - Automatic Toll Gates
+ * - Security Barrier Gates
+ * - STEM & Robotics Education
+ *
+ * MADE BY:
+ * Sir Anwar Siraj
+ * DS & AI Robotics
+ * ==============================================================
+ */
+
+#include <Servo.h>
+
+Servo myservo;
+
+int pos = 0;
+int cm = 0;
+
+// Function to measure distance using HC-SR04
+long readUltrasonicDistance(int triggerPin, int echoPin)
+{
+  pinMode(triggerPin, OUTPUT);
+
+  digitalWrite(triggerPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(triggerPin, LOW);
+
+  pinMode(echoPin, INPUT);
+
+  return pulseIn(echoPin, HIGH);
+}
+
+void setup()
+{
+  pinMode(12, OUTPUT);
+  digitalWrite(12, LOW);
+
+  myservo.attach(9);
+
+  Serial.begin(9600);
+
+  Serial.println("Smart Barrier Gate System Started");
+}
+
+void loop()
+{
+  // Measure distance in centimeters
+  cm = 0.01723 * readUltrasonicDistance(6, 7);
+
+  Serial.print("Distance: ");
+  Serial.print(cm);
+  Serial.println(" cm");
+
+  // Open gate when object is within 30 cm
+  if (cm > 0 && cm < 30)
+  {
+    Serial.println("Vehicle Detected - Opening Gate");
+
+    // Open barrier gate
+    for (pos = 0; pos <= 120; pos++)
+    {
+      myservo.write(pos);
+      delay(15);
+    }
+
+    delay(3000); // Gate remains open for 3 seconds
+
+    Serial.println("Closing Gate");
+
+    // Close barrier gate
+    for (pos = 120; pos >= 0; pos--)
+    {
+      myservo.write(pos);
+      delay(15);
+    }
+
+    delay(5000); // Wait before next detection
+  }
+
+  delay(100);
+}
+```
